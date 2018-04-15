@@ -242,14 +242,6 @@ public class SmartBarView extends BaseNavigationBar {
         }
     }
 
-    @Override
-    public void setPulseColors(boolean colorizedMedia, int[] colors) {
-        PulseController mPulse = getPulseController();
-        if (mPulse != null) {
-            mPulse.setPulseColors(colorizedMedia, colors);
-        }
-    }
-
     ArrayList<String> getCurrentSequence() {
         return mCurrentSequence;
     }

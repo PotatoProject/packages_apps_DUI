@@ -431,12 +431,4 @@ public class FlingView extends BaseNavigationBar {
             mPulse.setMediaPlaying(playing);
         }
     }
-
-    @Override
-    public void setPulseColors(boolean colorizedMedia, int[] colors) {
-        PulseController mPulse = getPulseController();
-        if (mPulse != null) {
-            mPulse.setPulseColors(colorizedMedia, colors);
-        }
-    }
 }

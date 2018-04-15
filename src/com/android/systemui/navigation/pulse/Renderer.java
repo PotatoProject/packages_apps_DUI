@@ -69,6 +69,4 @@ public abstract class Renderer implements VisualizerStreamHandler.Listener {
     public void setLeftInLandscape(boolean leftInLandscape) {}
 
     public void onSizeChanged(int w, int h, int oldw, int oldh) {}
-
-    public void setColors(boolean colorizedMedia, int[] colors) {}
 }

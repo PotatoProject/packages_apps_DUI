@@ -36,7 +36,6 @@ import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 
-import com.android.internal.util.NotificationColorUtil;
 import com.android.systemui.navigation.pulse.PulseController.PulseObserver;
 import com.android.systemui.navigation.utils.ColorAnimator;
 
@@ -46,8 +45,6 @@ public class SolidLineRenderer extends Renderer implements ColorAnimator.ColorAn
     private ValueAnimator[] mValueAnimators;
     private float[] mFFTPoints;
     private int mColor;
-    private int mAlbumColor = -1;
-    private boolean mAutoColor;
 
     private byte rfk, ifk;
     private int dbValue;
@@ -222,7 +219,7 @@ public class SolidLineRenderer extends Renderer implements ColorAnimator.ColorAn
 
     @Override
     public void onStopAnimation(ColorAnimator colorAnimator, int lastColor) {
-        mPaint.setColor(mAutoColor && mAlbumColor != -1 ? mAlbumColor : mColor);
+        mPaint.setColor(mColor);
     }
 
     private class CMRendererObserver extends ContentObserver {
@@ -252,9 +249,6 @@ public class SolidLineRenderer extends Renderer implements ColorAnimator.ColorAn
             resolver.registerContentObserver(
                     Settings.Secure.getUriFor(Settings.Secure.PULSE_SOLID_UNITS_OPACITY), false, this,
                     UserHandle.USER_ALL);
-            resolver.registerContentObserver(
-                    Settings.Secure.getUriFor(Settings.Secure.PULSE_AUTO_COLOR), false, this,
-                    UserHandle.USER_ALL);
         }
 
         @Override
@@ -264,21 +258,14 @@ public class SolidLineRenderer extends Renderer implements ColorAnimator.ColorAn
 
         public void updateSettings() {
             ContentResolver resolver = mContext.getContentResolver();
-
-            mAutoColor = Settings.Secure.getIntForUser(
-                    resolver, Settings.Secure.PULSE_AUTO_COLOR, 0,
-                    UserHandle.USER_CURRENT) == 1;
-
-            mLavaLampEnabled = !mAutoColor && Settings.Secure.getIntForUser(resolver,
+            mLavaLampEnabled = Settings.Secure.getIntForUser(resolver,
                     Settings.Secure.FLING_PULSE_LAVALAMP_ENABLED, 1, UserHandle.USER_CURRENT) == 1;
-
             mColor = Settings.Secure.getIntForUser(resolver,
                     Settings.Secure.FLING_PULSE_COLOR,
                     Color.WHITE,
                     UserHandle.USER_CURRENT);
             if (!mLavaLampEnabled) {
-                int lastColor = mController.getAlbumArtColor();
-                mPaint.setColor(mAutoColor && lastColor != -1 ? lastColor : mColor);
+                mPaint.setColor(mColor);
             }
             int lavaLampSpeed = Settings.Secure.getIntForUser(resolver,
                     Settings.Secure.PULSE_LAVALAMP_SOLID_SPEED, 10 * 1000,
@@ -306,22 +293,7 @@ public class SolidLineRenderer extends Renderer implements ColorAnimator.ColorAn
             int solidUnitsColor = Settings.Secure.getIntForUser(
                     resolver, Settings.Secure.PULSE_SOLID_UNITS_OPACITY, 200,
                     UserHandle.USER_CURRENT);
-            mFadePaint.setColor(Color.argb(mAutoColor ? 255 : solidUnitsColor, 255, 255, 255));
-        }
-    }
-
-    public void setColors(boolean colorizedMedia, int[] colors) {
-        if (colorizedMedia) {
-            // be sure the color will always have an acceptable contrast against black navbar
-            mAlbumColor = NotificationColorUtil.findContrastColorAgainstDark(colors[0], 0x000000, true, 2);
-            // now be sure the color will always have an acceptable contrast against white navbar
-            mAlbumColor = NotificationColorUtil.findContrastColor(mAlbumColor, 0xffffff, true, 2);
-        } else {
-            mAlbumColor = -1;
-        }
-        if (mAutoColor && !mLavaLampEnabled) {
-            mPaint.setColor(mAlbumColor != 1 ? mAlbumColor : mColor);
-            mController.setLastColor(mAlbumColor);
+            mFadePaint.setColor(Color.argb(solidUnitsColor, 255, 255, 255));
         }
     }
 }

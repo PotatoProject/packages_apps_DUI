@@ -425,10 +425,4 @@ public class PulseController {
             doLinkage();
         }
     }
-
-    public void setPulseColors(boolean colorizedMedia, int[] colors) {
-        if (mRenderer != null) {
-            mRenderer.setColors(colorizedMedia, colors);
-        }
-    }
 }
